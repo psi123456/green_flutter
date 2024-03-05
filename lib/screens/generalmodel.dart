@@ -38,18 +38,28 @@ class CarImageResponse {
   });
 
   factory CarImageResponse.fromJson(Map<String, dynamic> json) {
+  // vehicleType과 licensePlateText가 리스트가 아닐 경우를 대비해 유효성 검사를 추가합니다.
+  List<String> parseList(dynamic data) {
+    if (data == null) {
+      return [];
+    } else if (data is List) {
+      return List<String>.from(data);
+    } else {
+      return [data.toString()];
+    }
+  }
   return CarImageResponse(
-    vehicleType: List<String>.from(json['vehicle_type'] ?? []),
-    licensePlateText: List<String>.from(json['license_plate_text'] ?? []),
-    secondModelImageUrl: json['second_model_image_url'] ?? '',
-    licensePlateImageUrl: json['license_plate_image_url'] ?? '',
-    licensePlateVehicleType: json['LICENSE_PLATE_VEHICLE_TYPE'] ?? '',
-    gPrint: json['g_print'] ?? '',
-    originalImageUrl: json['original_image_url'] ?? '',
-    displacement: json['displacement']?.toDouble() ?? 0.0,
-    carbon_tax: json['carbon_tax']?.toDouble() ?? 0.0,
-    carbon_emission: json['carbon_emission']?.toDouble() ?? 0.0,
-    class_label: json['class_label'] ?? '',
+    vehicleType: parseList(json['vehicle_type']),
+    licensePlateText: parseList(json['license_plate_text']),
+    secondModelImageUrl: json['second_model_image_url'],
+    licensePlateImageUrl: json['license_plate_image_url'],
+    licensePlateVehicleType: json['LICENSE_PLATE_VEHICLE_TYPE'],
+    gPrint: json['g_print'],
+    originalImageUrl: json['original_image_url'],
+    displacement: json['displacement'].toDouble(),
+    carbon_tax: json['carbon_tax'].toDouble(),
+    carbon_emission: json['carbon_emission'].toDouble(),
+    class_label: json['class_label'],
   );
 }
 }
@@ -153,6 +163,7 @@ class _GeneralModelState extends State<GeneralModel> {
         var decodedResponse = utf8.decode(response.bodyBytes);
         setState(() {
           _response = CarImageResponse.fromJson(json.decode(decodedResponse));
+          print("123: $decodedResponse");
           _isLoading = false; // 응답을 받으면 로딩 상태를 false로 설정
         });
         print('받아온값: ${decodedResponse}');
